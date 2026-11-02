@@ -72,3 +72,14 @@ A running log of how AI assistants were used to build iBudget, one entry per mod
   - ruff's B008 rule flagged Typer's `typer.Option(...)` defaults; configured them as allowed calls instead of rewriting the idiomatic Typer style.
   - A test assumed `list` shows `#1`; it shows a plain ID column — the test was wrong, not the code.
 - **Testing:** 30 new tests (service-level for categories/config, end-to-end CLI tests through Typer's `CliRunner`, including a parametrized check that every user error exits 1 without a traceback). Manual run against a scratch database.
+
+## 4. Budgets & reports — 2026-11-02
+
+- **Tool:** Claude Code (Opus 5.5).
+- **Goal:** monthly budgets per category, a warning after `add`, and a monthly report with shares, budget usage and change vs the previous month.
+- **Key prompts:** "Implement step 5 of the plan: budgets and reports services, `budget` and `report` commands, warning after add, with tests for month boundaries, empty months and the previous-month comparison."
+- **What the AI produced:** `services/budgets.py` (a `BudgetStatus` with ok / warning ≥ 90% / over levels), `services/reports.py` (`monthly_report` and a 6-month `trend` reused later by the dashboard), the `budget set|list|remove` and `report` commands.
+- **What I corrected or rejected:**
+  - The first `report` command decided the colour thresholds itself (`>= 90`), duplicating budget logic in the CLI. Moved into one `level_for()` function in the budgets service, used by both the budget list and the report.
+  - A test expected "no data" for an empty month although a budget existed (budgets always show in the report). The behaviour was right; the test was split so the empty case runs on a fresh database.
+- **Testing:** 19 new tests: exact level thresholds (26999 / 27000 / 30000 / 30001 cents for a 300 budget), month boundaries (1st and 30th in, 1st of next month out), a trend across a year boundary, CLI warnings. Manual `report` run.

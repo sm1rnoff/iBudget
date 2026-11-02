@@ -31,6 +31,10 @@ Data is stored in your user data directory. Set `IBUDGET_DB=/path/to/file.db` or
 | `ibudget category add NAME` | Add a category |
 | `ibudget category rename OLD NEW` | Rename a category; its expenses and budget follow |
 | `ibudget category delete NAME [--reassign-to C] [--yes]` | Delete a category; one that has expenses needs `--reassign-to` |
+| `ibudget budget set CATEGORY AMOUNT` | Set a monthly budget; `add` warns at 90% and when it is exceeded |
+| `ibudget budget list [--month YYYY-MM]` | Budgets with spent, left and % used |
+| `ibudget budget remove CATEGORY` | Remove a budget |
+| `ibudget report [--month YYYY-MM]` | Spending per category: share, budget usage and change vs the previous month |
 | `ibudget config get [KEY]` / `ibudget config set KEY VALUE` | Show or change settings (`currency`, default `EUR`) |
 
 ## Development

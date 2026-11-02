@@ -125,3 +125,44 @@ def test_db_option(run, tmp_path):
     run("--db", str(other), "add", "5", "food")
     assert other.exists()
     assert "No expenses" in run("list").output  # the default (IBUDGET_DB) database is untouched
+
+
+def test_add_warns_near_and_over_budget(run):
+    run("budget", "set", "food", "100")
+    assert "budget" not in run("add", "50", "food", "--date", "2026-11-01").output
+    result = run("add", "40", "food", "--date", "2026-11-02")
+    assert "⚠ Food budget: 90.00 / 100.00 EUR (90%)" in result.output
+    result = run("add", "20", "food", "--date", "2026-11-03")
+    assert "⚠ Food over budget: 110.00 / 100.00 EUR (110%)" in result.output
+    # A different month has its own budget usage.
+    assert "budget" not in run("add", "20", "food", "--date", "2026-12-01").output
+
+
+def test_budget_commands(run):
+    assert "No budgets yet" in run("budget", "list").output
+    assert "food: 300.00 EUR per month" in run("budget", "set", "food", "300").output
+    run("add", "120", "food", "--date", "2026-11-05")
+    result = run("budget", "list", "--month", "2026-11")
+    assert "Budgets — November 2026" in result.output
+    assert "180.00" in result.output  # left
+    assert "40%" in result.output
+    assert run("budget", "remove", "food").exit_code == 0
+    assert run("budget", "remove", "food").exit_code == 1
+
+
+def test_report(run):
+    run("add", "200", "food", "--date", "2026-10-10")
+    run("add", "270", "food", "--date", "2026-11-10")
+    run("add", "650", "housing", "--date", "2026-11-01")
+    run("budget", "set", "food", "250")
+    result = run("report", "--month", "2026-11")
+    assert result.exit_code == 0
+    assert "November 2026" in result.output
+    assert "920.00" in result.output  # total
+    assert "108%" in result.output  # food budget used
+    assert "+35%" in result.output  # food vs October
+    assert "vs October 2026: 200.00 EUR (+360%)" in result.output
+
+
+def test_report_empty(run):
+    assert "No expenses or budgets for January 2020" in run("report", "-m", "2020-01").output

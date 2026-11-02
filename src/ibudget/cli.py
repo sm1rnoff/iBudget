@@ -15,12 +15,14 @@ from ibudget.models import Expense
 from ibudget.money import format_amount
 from ibudget.period import Month, parse_date
 from ibudget.repository import Repository
-from ibudget.services import categories, expenses
+from ibudget.services import budgets, categories, expenses, reports
 
 app = typer.Typer(help="iBudget: track personal expenses.", no_args_is_help=True)
 category_app = typer.Typer(help="List, add, rename and delete categories.", no_args_is_help=True)
 config_app = typer.Typer(help="Show or change settings.", no_args_is_help=True)
+budget_app = typer.Typer(help="Set, list and remove monthly budgets.", no_args_is_help=True)
 app.add_typer(category_app, name="category")
+app.add_typer(budget_app, name="budget")
 app.add_typer(config_app, name="config")
 
 console = Console()
@@ -73,6 +75,23 @@ def _describe(expense: Expense, currency: str) -> str:
     return f"#{expense.id}  {amount}  {expense.category}  {expense.date.isoformat()}{note}"
 
 
+LEVEL_STYLE = {
+    budgets.Level.ok: "green",
+    budgets.Level.warning: "yellow",
+    budgets.Level.over: "red",
+}
+
+
+def _signed_percent(value: int | None) -> str:
+    if value is None:
+        return "—"
+    return "=" if value == 0 else f"{value:+d}%"
+
+
+def _month_option(month: str | None) -> Month:
+    return Month.parse(month) if month else Month.current()
+
+
 # --- expenses -------------------------------------------------------------
 
 
@@ -87,7 +106,17 @@ def add(
     """Add an expense."""
     with _session(ctx) as repo:
         expense = expenses.add(repo, amount, category, note, parse_date(date) if date else None)
-        console.print(f"[green]✔ Added[/green] {_describe(expense, config.currency(repo))}")
+        currency = config.currency(repo)
+        console.print(f"[green]✔ Added[/green] {_describe(expense, currency)}")
+        status = budgets.status_for(repo, expense.category_id, Month.of(expense.date))
+        if status and status.level is not budgets.Level.ok:
+            spent = format_amount(status.spent_cents)
+            limit = format_amount(status.limit_cents, currency)
+            label = "over budget" if status.level is budgets.Level.over else "budget"
+            console.print(
+                f"[{LEVEL_STYLE[status.level]}]⚠ {status.category.capitalize()} {label}: "
+                f"{spent} / {limit} ({status.percent}%)[/]"
+            )
 
 
 @app.command("list")
@@ -105,7 +134,7 @@ def list_(
     with _session(ctx) as repo:
         if all_months and month:
             raise IBudgetError("Use either --month or --all, not both.")
-        period = None if all_months else (Month.parse(month) if month else Month.current())
+        period = None if all_months else _month_option(month)
         found = expenses.find(
             repo,
             month=period,
@@ -253,3 +282,102 @@ def config_set(
     """Change a setting."""
     with _session(ctx) as repo:
         console.print(f"[green]✔[/green] {key} = {config.set(repo, key, value)}")
+
+
+# --- budgets & report -----------------------------------------------------
+
+
+@budget_app.command("set")
+def budget_set(
+    ctx: typer.Context,
+    category: str = typer.Argument(..., help="Category name."),
+    amount: str = typer.Argument(..., help="Monthly limit."),
+) -> None:
+    """Set (or change) the monthly budget of a category."""
+    with _session(ctx) as repo:
+        budget = budgets.set_budget(repo, category, amount)
+        limit = format_amount(budget.limit_cents, config.currency(repo))
+        console.print(f"[green]✔ Budget[/green] {budget.category}: {limit} per month")
+
+
+@budget_app.command("list")
+def budget_list(
+    ctx: typer.Context,
+    month: str | None = typer.Option(None, "--month", "-m", help="YYYY-MM (default: this month)."),
+) -> None:
+    """Show every budget and how much of it is used."""
+    with _session(ctx) as repo:
+        period = _month_option(month)
+        rows = budgets.statuses(repo, period)
+        if not rows:
+            console.print("No budgets yet. Add one with `ibudget budget set CATEGORY AMOUNT`.")
+            return
+        currency = config.currency(repo)
+        table = Table(title=f"Budgets — {period.label}")
+        table.add_column("Category")
+        table.add_column(f"Budget ({currency})", justify="right")
+        table.add_column("Spent", justify="right")
+        table.add_column("Left", justify="right")
+        table.add_column("Used", justify="right")
+        for row in rows:
+            style = LEVEL_STYLE[row.level]
+            table.add_row(
+                row.category,
+                format_amount(row.limit_cents),
+                format_amount(row.spent_cents),
+                format_amount(row.remaining_cents),
+                f"[{style}]{row.percent}%[/]",
+            )
+        console.print(table)
+
+
+@budget_app.command("remove")
+def budget_remove(
+    ctx: typer.Context, category: str = typer.Argument(..., help="Category name.")
+) -> None:
+    """Remove the budget of a category."""
+    with _session(ctx) as repo:
+        budgets.remove(repo, category)
+        console.print(f"[green]✔ Removed budget[/green] {category.strip().lower()}")
+
+
+@app.command()
+def report(
+    ctx: typer.Context,
+    month: str | None = typer.Option(None, "--month", "-m", help="YYYY-MM (default: this month)."),
+) -> None:
+    """Monthly report: spending per category, budgets and change vs the previous month."""
+    with _session(ctx) as repo:
+        result = reports.monthly_report(repo, _month_option(month))
+        currency = config.currency(repo)
+        previous = result.month.previous().label
+        if not result.rows:
+            console.print(f"No expenses or budgets for {result.month.label}.")
+            return
+        table = Table(
+            title=f"{result.month.label}",
+            caption=f"vs {previous}: {format_amount(result.previous_total_cents, currency)}"
+            f" ({_signed_percent(result.change_percent)})",
+            show_footer=True,
+        )
+        table.add_column("Category", footer="Total")
+        table.add_column(
+            f"Spent ({currency})", justify="right", footer=format_amount(result.total_cents)
+        )
+        table.add_column("Share", justify="right")
+        table.add_column("Budget", justify="right")
+        table.add_column("Used", justify="right")
+        table.add_column(f"vs {result.month.previous().start:%b}", justify="right")
+        for row in result.rows:
+            used = "—"
+            if row.budget_level is not None:
+                used = f"[{LEVEL_STYLE[row.budget_level]}]{row.budget_percent}%[/]"
+            table.add_row(
+                row.category,
+                format_amount(row.spent_cents),
+                f"{row.share_percent}%",
+                format_amount(row.budget_cents) if row.budget_cents else "—",
+                used,
+                _signed_percent(row.change_percent),
+            )
+        console.print(table)
