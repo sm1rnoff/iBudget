@@ -1,0 +1,9 @@
+schema_version: "1.1"
+name: browser-test-transport-filter
+expected_outcome: |
+  A new test in tests/test_browser.py, starting from the dashboard fixture. Transport
+  expenses are added to the EXPENSES seed list (the browser server never sees data added
+  with the repo/add fixtures), and existing browser tests are adjusted if the new rows
+  affect them. The test waits for HTMX to settle between the filter swap and the month
+  click, checks the page was not reloaded and that the Category select is back to All.
+  No template changes. The browser file passes several runs in a row; suite and ruff pass.

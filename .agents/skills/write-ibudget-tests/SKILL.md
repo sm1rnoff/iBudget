@@ -25,10 +25,11 @@ Test a rule at the lowest layer that owns it, and only the wiring in the layers 
 ## 2. Test data: temporary database, fixed dates, cents
 
 - The autouse `db_path` fixture in `tests/conftest.py` gives every test a fresh database and points `IBUDGET_DB` at it, so the CLI and `default_db_path()` use it too. Never open or pass any other path; the real database must stay untouched.
-- Insert expenses with `add("2026-11-02", 1250, "food", "Lunch")`: date, cents, category name, note. Seeded categories (`food`, `transport`, `housing`, ...) exist from the start; create others with `repo.add_category`.
+- Insert expenses with `add("2026-11-14", 1250, "food", "Lunch")`: date, cents, category name, note. Seeded categories (`food`, `transport`, `housing`, ...) exist from the start; create others with `repo.add_category`.
 - Use fixed dates around November 2026 (`NOV = Month(2026, 11)`), not today, so a test gives the same result next month. Only tests about "defaults to today" use `dt.date.today()` or `Month.current()`.
 - Money is integer cents in services (`28750`) and formatted text at the edges (`"287.50"`). Never compare money as floats.
 - Choose data that makes the assertion prove something: an expense in the previous month that must *not* count, a total that differs from every single row, and rows whose date order and amount order differ when testing sorting.
+- An explicit input must differ from the default the code would fall back to, or the test cannot tell the input was used. Dates are the easy one to miss: when code defaults to today, pass a date that cannot be today, such as one in another year (`dt.date(2025, 3, 14)`). A date from the current month passes even when the argument is ignored, on the day the two happen to match.
 - CSV input: build small files inline with the `write(tmp_path, text)` helper in `test_csv_io.py`. The shared bank sample is `tests/fixtures/bank_sample.csv`; reference it through `Path(__file__).parent`, not a path relative to the working directory.
 
 ## 3. Shape of a test

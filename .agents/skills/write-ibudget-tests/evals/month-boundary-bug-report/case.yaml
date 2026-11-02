@@ -1,0 +1,9 @@
+schema_version: "1.1"
+name: month-boundary-bug-report
+expected_outcome: |
+  The report concludes it is not a bug: months include their first day and exclude the
+  first day of the next month, so an expense on the last day is counted. This is backed by
+  a test at the service or repository level (new, or the existing one in test_reports.py)
+  covering both sides of the month end. No production code changes. The report says the
+  boundary was broken on purpose (e.g. `<` to `<=`) to show the test catches it, then
+  restored. Suite and ruff pass.

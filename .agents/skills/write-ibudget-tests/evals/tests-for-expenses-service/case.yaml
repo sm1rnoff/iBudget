@@ -1,0 +1,8 @@
+schema_version: "1.1"
+name: tests-for-expenses-service
+expected_outcome: |
+  A new tests/test_expenses.py tests add, get, find, edit and delete directly through
+  ibudget.services.expenses, using the repo/add fixtures, fixed dates and integer cents.
+  User errors are asserted with pytest.raises(IBudgetError, match=...). No production code
+  changes. The full suite and ruff pass, and the report says which deliberate break of the
+  service the new tests caught.
