@@ -154,3 +154,22 @@ A running log of how AI assistants were used to build iBudget, one entry per mod
 - **What the AI produced:** `.agents/skills/write-ibudget-tests/SKILL.md`, linked from `.claude/skills/`: which layer and file to test in, test data rules (temporary database, fixed dates, cents, data that proves something), the shape of a test, the browser-test rules learned in step 8 (seed through `EXPENSES`, the reload marker, `wait_until_settled`), proving each test can fail, and how to report. `add-ibudget-command` now points to it for its testing step.
 - **What I corrected or rejected:** nothing yet. The skill-creator's with/without-skill benchmark was not run, so the skill is checked by validation only.
 - **Testing:** skill-creator's `quick_validate` passes; a script confirmed that all 30 fixtures, helpers, test names and paths the skill cites exist; Claude Code listed the skill as soon as it was linked. Suite unchanged: 121 tests, ruff clean.
+
+## 10. Benchmarking the testing skill — 2026-11-02
+
+- **Tool:** Claude Code (Opus 5.5) with Anthropic's `skill-creator`: subagents ran each task with and without the skill, each in its own clone of the repo with its own venv; the baseline clones had the pre-skill repo (no skill, no CLAUDE.md rule, no journal entry 9).
+- **Goal:** find out whether `write-ibudget-tests` actually makes an agent write better tests here.
+- **Key prompts:**
+  1. "Run the benchmark"
+  2. "Fix, rerun on Sonnet"
+- **What the AI produced:** three test cases in `.agents/skills/write-ibudget-tests/evals/` (tests for the expenses service; a browser test for the transport filter; a "last day of the month goes missing" bug report that is not a bug), 22 graded statements, grading scripts that re-ran each copy's suite and planted known bugs, and skill-creator's review page.
+
+  | Iteration | Agent model | With skill | Without skill | Time / tokens with skill |
+  |---|---|---|---|---|
+  | 1 | Opus 5.5 | 96% (21/22) | 100% | +25 s, +6.7k |
+  | 2 (fixed skill) | Sonnet 5.5 | 100% | 100% | −7 s, −2.8k |
+
+- **What I corrected or rejected:**
+  - Iteration 1 found a flaw in the skill itself: its example date and its "fixed dates around November 2026" advice matched the day of the run, so the with-skill agent's "explicit date" test could not notice `expenses.add` ignoring its date argument. The baseline had pinned today and caught it. The skill now says explicit inputs must differ from the default the code falls back to; in iteration 2 the with-skill agent used a 2025 date and the planted bug was caught.
+  - The honest result: both models already pass every check without the skill, because CLAUDE.md, the conftest fixtures and the documented browser helpers carry the conventions. The skill's measurable effect is small (one fixed blind spot, a lighter-touch browser seed change). Showing a real benefit would need harder cases where the code does not already demonstrate the pattern.
+- **Testing:** one run per configuration and case (12 agent runs). The grader re-ran every copy's full suite, ruff, the browser tests 3 times, and planted bugs (an ignored date argument, `<` → `<=` on month ends) against each run's new tests.
