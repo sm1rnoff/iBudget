@@ -55,3 +55,20 @@ A running log of how AI assistants were used to build iBudget, one entry per mod
   - A `Month` value type (parse, shift, start/end) used by every layer.
 - **What I corrected or rejected:** ruff flagged two over-long SQL lines; fixed.
 - **Testing:** 36 new tests on a temporary database per test (an autouse fixture sets `IBUDGET_DB`, so real data is never touched).
+
+## 3. CLI core — 2026-11-02
+
+- **Tool:** Claude Code (Opus 5.5).
+- **Goal:** `add`, `list`, `edit`, `delete`, full category management (add / rename / delete with reassign) and `config`.
+- **Key prompts:**
+  1. "Implement step 4 of the plan: CLI core with services for expenses, categories and config, and CliRunner tests."
+  2. (from my plan review) "User must be able to add/delete and modify categories."
+- **What the AI produced:**
+  - Services `services/expenses.py`, `services/categories.py` and `config.py`; `cli.py` only parses input, calls them and prints Rich tables.
+  - One `_session()` context manager in the CLI that opens the database and turns every `IBudgetError` into a red one-line message with exit code 1 — no stack traces for user mistakes.
+  - Category deletion is split into `check_delete` (validate, no changes) and `delete`, so the CLI can show "moving 2 expense(s) to other" in the confirmation prompt *before* anything changes.
+- **What I corrected or rejected:**
+  - First version asked "Delete category?" and only then reported that the category still had expenses — fixed by validating before confirming.
+  - ruff's B008 rule flagged Typer's `typer.Option(...)` defaults; configured them as allowed calls instead of rewriting the idiomatic Typer style.
+  - A test assumed `list` shows `#1`; it shows a plain ID column — the test was wrong, not the code.
+- **Testing:** 30 new tests (service-level for categories/config, end-to-end CLI tests through Typer's `CliRunner`, including a parametrized check that every user error exits 1 without a traceback). Manual run against a scratch database.

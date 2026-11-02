@@ -84,6 +84,13 @@ class Repository:
             "SELECT COUNT(*) FROM expenses WHERE category_id = ?", (category_id,)
         ).fetchone()[0]
 
+    def expense_counts(self) -> dict[int, int]:
+        """Number of expenses per category id (categories without expenses are absent)."""
+        rows = self.conn.execute(
+            "SELECT category_id, COUNT(*) AS n FROM expenses GROUP BY category_id"
+        ).fetchall()
+        return {row["category_id"]: row["n"] for row in rows}
+
     # --- expenses ---------------------------------------------------------
 
     def add_expense(
