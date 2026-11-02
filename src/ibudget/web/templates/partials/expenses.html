@@ -1,0 +1,44 @@
+<div class="table-head">
+  <h2>Expenses</h2>
+  <form class="filters" action="/" method="get"
+        hx-get="/partials/expenses" hx-target="#expenses" hx-trigger="change">
+    <input type="hidden" name="month" value="{{ month }}">
+    <label>Category
+      <select name="category">
+        <option value="">All</option>
+        {% for name in category_names %}
+        <option value="{{ name }}" {% if name == category %}selected{% endif %}>{{ name }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>Sort
+      <select name="sort">
+        <option value="date" {% if sort == "date" %}selected{% endif %}>Newest first</option>
+        <option value="amount" {% if sort == "amount" %}selected{% endif %}>Largest first</option>
+      </select>
+    </label>
+    <noscript><button type="submit">Apply</button></noscript>
+  </form>
+</div>
+{% if expenses %}
+<table class="expenses">
+  <thead>
+    <tr><th>Date</th><th>Category</th><th class="num">Amount ({{ currency }})</th><th>Note</th></tr>
+  </thead>
+  <tbody>
+    {% for e in expenses %}
+    <tr>
+      <td>{{ e.date.isoformat() }}</td>
+      <td><span class="tag">{{ e.category }}</span></td>
+      <td class="num">{{ e.amount_cents | money }}</td>
+      <td class="note">{{ e.note }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+  <tfoot>
+    <tr><td colspan="2">{{ expenses | length }} expense(s)</td><td class="num">{{ expenses_total | money }}</td><td></td></tr>
+  </tfoot>
+</table>
+{% else %}
+<p class="empty">No expenses{% if category %} in {{ category }}{% endif %} for {{ month.label }}.</p>
+{% endif %}

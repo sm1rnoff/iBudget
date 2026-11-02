@@ -478,3 +478,27 @@ def export(
         with output.open("w", newline="", encoding="utf-8") as handle:
             count = csv_io.export_csv(repo, handle, period)
         err_console.print(f"[green]✔ Exported {count} expense(s) to {output}[/green]")
+
+
+# --- dashboard ------------------------------------------------------------
+
+
+@app.command()
+def serve(
+    ctx: typer.Context,
+    host: str = typer.Option(
+        "127.0.0.1", "--host", help="Interface to bind (default: local only)."
+    ),
+    port: int = typer.Option(8000, "--port", "-p", help="Port."),
+) -> None:
+    """Start the read-only web dashboard."""
+    import uvicorn
+
+    from ibudget.web.app import create_app
+
+    with _session(ctx):
+        pass  # fail early with a clean message if the database cannot be opened
+    if host not in ("127.0.0.1", "localhost", "::1"):
+        err_console.print(f"[yellow]⚠ Serving on {host}: other machines may see your data.[/]")
+    console.print(f"iBudget dashboard on [bold]http://{host}:{port}[/bold] (Ctrl+C to stop)")
+    uvicorn.run(create_app(ctx.obj["db"]), host=host, port=port, log_level="warning")

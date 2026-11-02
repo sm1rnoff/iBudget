@@ -37,6 +37,7 @@ Data is stored in your user data directory. Set `IBUDGET_DB=/path/to/file.db` or
 | `ibudget report [--month YYYY-MM]` | Spending per category: share, budget usage and change vs the previous month |
 | `ibudget import FILE [--map date=Col,amount=Col,note=Col,category=Col] [--date-format FMT] [--default-category C] [--signed] [--dry-run]` | Import a CSV (e.g. a bank statement); re-importing skips duplicates |
 | `ibudget export [--month YYYY-MM] [--output FILE]` | Export as CSV (stdout by default); the file can be imported again |
+| `ibudget serve [--host 127.0.0.1] [--port 8000]` | Start the read-only web dashboard |
 | `ibudget config get [KEY]` / `ibudget config set KEY VALUE` | Show or change settings (`currency`, default `EUR`) |
 
 ### Importing a bank statement
@@ -50,6 +51,21 @@ ibudget import statement.csv \
 - The delimiter (`,` `;` or tab) is detected from the header line; amounts may use `12,50` or `1.234,56`.
 - `--signed`: negative amounts are expenses, positive rows (income) are skipped. Without it every amount is taken as an expense.
 - Rows whose category column matches a known category keep it; the rest go to `--default-category` (default `other`).
+
+## Dashboard
+
+```bash
+ibudget serve            # http://127.0.0.1:8000
+```
+
+A read-only page for one month at a time: summary cards, where the money went, budget bars, the last 6 months and the expense table. Switching months, filtering by category and sorting swap parts of the page with [HTMX](https://htmx.org) instead of reloading it; the address bar always holds a shareable URL such as `/?month=2026-10&category=food`. To change data, use the CLI.
+
+### Demo data
+
+```bash
+./demo/setup.sh                                   # creates .demo/ibudget.db with 6 months of sample data
+.venv/bin/ibudget --db .demo/ibudget.db serve
+```
 
 ## Development
 

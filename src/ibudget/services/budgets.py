@@ -17,6 +17,11 @@ class Level(StrEnum):
     over = "over"  # budget exceeded
 
 
+def used_percent(spent_cents: int, limit_cents: int) -> int:
+    """Share of the budget used, rounded down so it never shows 90% before the warning starts."""
+    return spent_cents * 100 // limit_cents
+
+
 def level_for(spent_cents: int, limit_cents: int) -> Level:
     if spent_cents > limit_cents:
         return Level.over
@@ -37,7 +42,7 @@ class BudgetStatus:
 
     @property
     def percent(self) -> int:
-        return round(self.spent_cents * 100 / self.limit_cents)
+        return used_percent(self.spent_cents, self.limit_cents)
 
     @property
     def level(self) -> Level:

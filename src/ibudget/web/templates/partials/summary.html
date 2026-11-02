@@ -1,0 +1,33 @@
+<section class="cards" aria-label="Summary">
+  <div class="card stat">
+    <span class="stat-label">Spent</span>
+    <span class="stat-value">{{ report.total_cents | money }} <small>{{ currency }}</small></span>
+  </div>
+  <div class="card stat">
+    <span class="stat-label">vs {{ month.previous().label }}</span>
+    {% set change = report.change_percent %}
+    <span class="stat-value {% if change is not none and change > 0 %}up{% elif change is not none and change < 0 %}down{% endif %}">
+      {% if change is none %}—{% elif change == 0 %}={% else %}{{ "%+d" | format(change) }}%{% endif %}
+    </span>
+    <span class="stat-note">{{ report.previous_total_cents | money }} {{ currency }}</span>
+  </div>
+  <div class="card stat">
+    <span class="stat-label">Budgets</span>
+    {% if budgets %}
+    <span class="stat-value">{{ budgets_over }} <small>over</small> · {{ budgets_warning }} <small>near</small></span>
+    <span class="stat-note">of {{ budgets | length }} budget(s)</span>
+    {% else %}
+    <span class="stat-value">—</span>
+    <span class="stat-note">none set</span>
+    {% endif %}
+  </div>
+  <div class="card stat">
+    <span class="stat-label">Biggest category</span>
+    {% if spending_rows %}
+    <span class="stat-value">{{ spending_rows[0].category }}</span>
+    <span class="stat-note">{{ spending_rows[0].share_percent }}% of the month</span>
+    {% else %}
+    <span class="stat-value">—</span>
+    {% endif %}
+  </div>
+</section>

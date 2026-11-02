@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from ibudget.period import Month
 from ibudget.repository import Repository
-from ibudget.services.budgets import Level, level_for
+from ibudget.services.budgets import Level, level_for, used_percent
 
 
 def percent(part: int, whole: int) -> int | None:
@@ -29,7 +29,7 @@ class ReportRow:
 
     @property
     def budget_percent(self) -> int | None:
-        return percent(self.spent_cents, self.budget_cents) if self.budget_cents else None
+        return used_percent(self.spent_cents, self.budget_cents) if self.budget_cents else None
 
     @property
     def budget_level(self) -> Level | None:

@@ -1,0 +1,22 @@
+{% if partial %}<title>iBudget · {{ month.label }}</title>{% endif %}
+{% set prev = month.previous() %}{% set next = month.next() %}
+<nav class="month-nav" aria-label="Month">
+  <a class="nav-button" href="{{ page_url(prev) }}"
+     hx-get="/partials/month?month={{ prev }}" hx-target="#month">‹ <span class="full">{{ prev.label }}</span><span class="short">{{ prev.start.strftime("%b") }}</span></a>
+  <h1>{{ month.label }}</h1>
+  <a class="nav-button" href="{{ page_url(next) }}"
+     hx-get="/partials/month?month={{ next }}" hx-target="#month"><span class="full">{{ next.label }}</span><span class="short">{{ next.start.strftime("%b") }}</span> ›</a>
+</nav>
+
+{% include "partials/summary.html" %}
+
+<div class="grid">
+  {% include "partials/breakdown.html" %}
+  {% include "partials/budgets.html" %}
+</div>
+
+{% include "partials/trend.html" %}
+
+<section id="expenses" class="card">
+  {% include "partials/expenses.html" %}
+</section>

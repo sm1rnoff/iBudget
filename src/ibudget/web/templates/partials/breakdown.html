@@ -1,0 +1,16 @@
+<section class="card" aria-labelledby="breakdown-title">
+  <h2 id="breakdown-title">Where it went</h2>
+  {% if spending_rows %}
+  <ul class="bars">
+    {% for row in spending_rows %}
+    <li class="bar-row">
+      <span class="bar-label">{{ row.category }}</span>
+      <span class="bar-track"><span class="bar-fill" style="width: {{ row.share_percent }}%"></span></span>
+      <span class="bar-value">{{ row.spent_cents | money }} <small>{{ row.share_percent }}%</small></span>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p class="empty">No spending this month.</p>
+  {% endif %}
+</section>

@@ -22,6 +22,12 @@ def test_status_numbers():
     assert (status.remaining_cents, status.percent) == (-1250, 104)
 
 
+def test_percent_rounds_down_to_match_level():
+    # 98.85 of 110.00 is 89.86%: shown as 89% and not yet a warning, never "90%" in green.
+    status = BudgetStatus("utilities", 11000, 9885)
+    assert (status.percent, status.level) == (89, Level.ok)
+
+
 def test_set_list_remove(repo, add):
     add("2026-11-02", 28750, "food")
     add("2026-10-30", 5000, "food")  # previous month does not count

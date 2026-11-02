@@ -1,0 +1,140 @@
+date,amount,category,note
+2026-06-01,26.13,food,Lidl
+2026-06-01,650.00,housing,Rent
+2026-06-02,69.03,entertainment,Spotify
+2026-06-03,23.81,food,Coffee
+2026-06-03,45.00,transport,Monthly pass
+2026-06-04,6.92,food,Lunch
+2026-06-05,7.08,food,Lunch
+2026-06-06,23.23,food,Kaufland
+2026-06-09,23.91,food,Lidl
+2026-06-09,48.98,entertainment,Cinema
+2026-06-10,120.33,shopping,Home goods
+2026-06-11,33.19,food,Bakery
+2026-06-12,22.38,food,Coffee
+2026-06-12,63.10,utilities,Electricity & water
+2026-06-13,31.75,food,Kaufland
+2026-06-14,23.42,food,Kaufland
+2026-06-15,22.62,food,Lidl
+2026-06-15,34.55,health,Pharmacy
+2026-06-15,39.99,utilities,Internet & phone
+2026-06-18,22.08,food,Bakery
+2026-06-19,35.40,food,Bakery
+2026-06-19,159.03,shopping,Gift
+2026-06-20,31.01,food,Market
+2026-06-22,14.21,food,Lunch
+2026-06-25,37.33,food,Lidl
+2026-06-26,9.61,food,Bakery
+2026-06-26,47.58,entertainment,Cinema
+2026-06-27,20.62,food,Lidl
+2026-06-29,22.97,food,Bakery
+2026-06-30,15.91,food,Lunch
+2026-07-01,11.42,food,Bakery
+2026-07-01,650.00,housing,Rent
+2026-07-02,12.42,food,Lunch
+2026-07-03,45.00,transport,Monthly pass
+2026-07-04,9.66,food,Lunch
+2026-07-05,19.97,entertainment,Spotify
+2026-07-05,34.04,food,Lunch
+2026-07-07,18.12,food,Bakery
+2026-07-09,11.85,food,Lidl
+2026-07-09,87.01,shopping,Clothes
+2026-07-10,11.89,food,Kaufland
+2026-07-11,32.26,food,Kaufland
+2026-07-12,4.14,food,Lunch
+2026-07-12,70.27,utilities,Electricity & water
+2026-07-13,24.73,food,Bakery
+2026-07-15,39.99,utilities,Internet & phone
+2026-07-16,25.00,food,Market
+2026-07-16,49.74,entertainment,Cinema
+2026-07-17,23.23,shopping,Home goods
+2026-07-18,33.61,food,Market
+2026-07-18,65.28,health,Pharmacy
+2026-07-20,17.57,food,Lidl
+2026-07-21,17.62,food,Kaufland
+2026-07-22,11.10,food,Kaufland
+2026-07-23,24.42,food,Lidl
+2026-07-24,9.14,food,Lidl
+2026-07-27,11.07,food,Lunch
+2026-07-28,12.58,food,Bakery
+2026-07-30,7.92,food,Lunch
+2026-08-01,25.86,food,Lidl
+2026-08-01,650.00,housing,Rent
+2026-08-03,16.47,food,Kaufland
+2026-08-03,45.00,transport,Monthly pass
+2026-08-04,11.57,food,Coffee
+2026-08-06,11.58,food,Kaufland
+2026-08-10,21.60,food,Bakery
+2026-08-12,73.95,utilities,Electricity & water
+2026-08-14,10.58,food,Coffee
+2026-08-15,39.99,utilities,Internet & phone
+2026-08-16,35.86,food,Bakery
+2026-08-18,11.50,food,Kaufland
+2026-08-18,38.34,shopping,Shoes
+2026-08-19,15.48,food,Lunch
+2026-08-20,76.47,entertainment,Books
+2026-08-20,289.00,transport,Train tickets — holiday
+2026-08-22,85.12,entertainment,Concert
+2026-08-23,26.20,food,Market
+2026-08-24,26.46,food,Lunch
+2026-08-26,155.92,shopping,Shoes
+2026-08-27,10.07,food,Market
+2026-08-28,31.23,food,Market
+2026-08-29,17.65,food,Lidl
+2026-08-29,48.30,entertainment,Concert
+2026-08-31,8.32,food,Kaufland
+2026-09-01,33.64,food,Kaufland
+2026-09-01,650.00,housing,Rent
+2026-09-02,11.23,food,Coffee
+2026-09-03,23.94,food,Bakery
+2026-09-03,28.59,entertainment,Spotify
+2026-09-03,45.00,transport,Monthly pass
+2026-09-03,64.35,entertainment,Books
+2026-09-04,32.36,food,Lidl
+2026-09-06,19.58,food,Coffee
+2026-09-08,32.12,food,Coffee
+2026-09-09,9.16,food,Coffee
+2026-09-10,18.96,food,Kaufland
+2026-09-12,78.34,utilities,Electricity & water
+2026-09-13,8.81,food,Coffee
+2026-09-15,39.99,utilities,Internet & phone
+2026-09-16,21.62,food,Coffee
+2026-09-17,30.40,food,Coffee
+2026-09-18,10.50,food,Lidl
+2026-09-20,23.10,food,Lidl
+2026-09-21,24.83,food,Coffee
+2026-09-23,13.42,food,Coffee
+2026-09-24,20.25,food,Kaufland
+2026-09-28,23.02,food,Kaufland
+2026-09-30,8.14,food,Lunch
+2026-10-01,650.00,housing,Rent
+2026-10-03,34.02,food,Lunch
+2026-10-03,45.00,transport,Monthly pass
+2026-10-04,36.39,food,Lunch
+2026-10-06,26.71,food,Kaufland
+2026-10-07,18.67,food,Coffee
+2026-10-08,18.32,food,Bakery
+2026-10-08,151.34,shopping,Clothes
+2026-10-09,27.05,shopping,Clothes
+2026-10-09,28.55,food,Lidl
+2026-10-10,19.59,food,Market
+2026-10-11,15.27,food,Coffee
+2026-10-12,36.67,food,Lidl
+2026-10-12,58.86,utilities,Electricity & water
+2026-10-15,39.99,utilities,Internet & phone
+2026-10-16,13.03,food,Lidl
+2026-10-18,29.70,food,Lunch
+2026-10-18,44.59,entertainment,Spotify
+2026-10-20,22.08,entertainment,Dinner out
+2026-10-22,22.24,food,Coffee
+2026-10-25,5.96,food,Market
+2026-10-26,34.44,food,Bakery
+2026-10-30,33.11,food,Lidl
+2026-10-31,8.14,food,Lidl
+2026-11-01,11.00,food,Lunch
+2026-11-01,650.00,housing,Rent
+2026-11-02,10.05,food,Bakery
+2026-11-02,129.00,health,Dentist
+2026-11-03,45.00,transport,Monthly pass
+2026-11-12,70.72,utilities,Electricity & water
+2026-11-15,39.99,utilities,Internet & phone

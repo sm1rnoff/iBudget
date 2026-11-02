@@ -6,7 +6,7 @@ Personal expense tracker: the `ibudget` CLI plus a read-only HTMX dashboard (`ib
 
 - Python 3.14, package in `src/ibudget/`, installed editable into `.venv`.
 - Typer + Rich for the CLI; FastAPI + Jinja2 + HTMX for the dashboard; SQLite through the standard `sqlite3` module.
-- pytest (+ pytest-cov, httpx for FastAPI's TestClient) and ruff.
+- pytest (+ pytest-cov, httpx2 for FastAPI's TestClient) and ruff.
 
 ## Commands
 

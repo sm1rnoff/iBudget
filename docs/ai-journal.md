@@ -96,3 +96,22 @@ A running log of how AI assistants were used to build iBudget, one entry per mod
   - `csv.Sniffer` can mistake decimal commas (`12,50`) for the delimiter in semicolon files, so the delimiter is now picked from the header line only.
   - One CLI test had a wrong hand-calculated total (1,945.46 instead of 1,948.46) — the test was fixed, the code was right.
 - **Testing:** 16 new tests, including the fixture end to end, re-import = all duplicates, dry run writes nothing, missing/explicitly mapped columns, and an export → import round trip into a fresh database (with commas and quotes in notes).
+
+## 6. HTMX dashboard — 2026-11-02
+
+- **Tool:** Claude Code (Opus 5.5), plus its built-in browser to check the running page.
+- **Goal:** `ibudget serve` — a read-only dashboard that reuses the CLI's services and updates in place with HTMX.
+- **Key prompts:**
+  1. (from my plan review) "For UI choose HTMX."
+  2. "Implement step 7 of the plan: FastAPI app, Jinja2 templates and partials, CSS bars, serve command, TestClient tests."
+- **What the AI produced:**
+  - `web/app.py` with three routes: `/` (full page), `/partials/month` (everything for one month) and `/partials/expenses` (just the table). Each partial response sets an `HX-Push-Url` header, so the address bar always shows the shareable full-page URL and the back button works.
+  - Server-rendered HTML/CSS bars instead of a chart library, so swapped fragments need no JavaScript besides HTMX. Links and the filter form also work without JavaScript (progressive enhancement).
+  - `demo/expenses.csv` + `demo/setup.sh` for reproducible screenshots.
+- **What I corrected or rejected (found while checking the page in the browser):**
+  - Utilities showed "90%" in green with "0 near budget": 98.85 / 110 is 89.86%, which was rounded up for display while the warning starts at 90%. Budget percentages now round down; regression test added.
+  - The browser tab title stayed on the old month after an HTMX swap; the month partial now includes a `<title>` that HTMX applies.
+  - Mobile: doubled spacing between cards and cramped month buttons (now "‹ Oct" / "Dec ›").
+  - ruff flagged `Depends(...)` defaults; switched to FastAPI's recommended `Annotated[..., Depends(...)]` style.
+  - Starlette deprecated `httpx` for its test client; the dev dependency is now `httpx2`.
+- **Testing:** 14 web tests with FastAPI's `TestClient` (full page, fragments, `HX-Push-Url`, filters, sorting, empty month, 400/422 errors, read-only `POST` → 405, HTML escaping). In the browser: filter, month switch and back button verified without a full reload (a JS marker survived), no console errors, mobile and light/dark layouts.

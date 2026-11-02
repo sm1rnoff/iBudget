@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}iBudget{% endblock %}</title>
+  <link rel="stylesheet" href="/static/dashboard.css">
+  <script src="{{ htmx_url }}" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/">iBudget</a>
+    <span class="readonly">read-only dashboard · v{{ version }}</span>
+  </header>
+  {% block content %}{% endblock %}
+  <footer class="footer">Change data with the <code>ibudget</code> CLI; this page only shows it.</footer>
+</body>
+</html>

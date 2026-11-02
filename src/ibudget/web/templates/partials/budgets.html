@@ -1,0 +1,16 @@
+<section class="card" aria-labelledby="budgets-title">
+  <h2 id="budgets-title">Budgets</h2>
+  {% if budgets %}
+  <ul class="bars">
+    {% for status in budgets %}
+    <li class="bar-row">
+      <span class="bar-label">{{ status.category }}</span>
+      <span class="bar-track"><span class="bar-fill level-{{ status.level }}" style="width: {{ [status.percent, 100] | min }}%"></span></span>
+      <span class="bar-value">{{ status.spent_cents | money }} / {{ status.limit_cents | money }} <small class="level-text-{{ status.level }}">{{ status.percent }}%</small></span>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p class="empty">No budgets yet. Add one with <code>ibudget budget set food 300</code>.</p>
+  {% endif %}
+</section>

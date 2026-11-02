@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "ibudget-dashboard",
+      "runtimeExecutable": ".venv/bin/ibudget",
+      "runtimeArgs": ["--db", ".demo/ibudget.db", "serve", "--port", "8765"],
+      "port": 8765
+    }
+  ]
+}

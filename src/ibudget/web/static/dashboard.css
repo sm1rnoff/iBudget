@@ -1,0 +1,196 @@
+:root {
+  --bg: #f5f6f8;
+  --surface: #ffffff;
+  --text: #1c2430;
+  --muted: #667085;
+  --border: #e4e7ec;
+  --accent: #2f6fde;
+  --accent-soft: #dbe7fb;
+  --ok: #2e9d62;
+  --warning: #d99a1e;
+  --over: #d64545;
+  --track: #eef0f3;
+  --shadow: 0 1px 2px rgb(16 24 40 / 6%);
+  --radius: 12px;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #12161c;
+    --surface: #1b2129;
+    --text: #e6e9ee;
+    --muted: #98a2b3;
+    --border: #2a323d;
+    --accent: #6c9dfa;
+    --accent-soft: #24375a;
+    --ok: #4cc488;
+    --warning: #f0b44a;
+    --over: #f07070;
+    --track: #262e39;
+    --shadow: none;
+    color-scheme: dark;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+
+code { font-size: 0.9em; background: var(--track); padding: 1px 5px; border-radius: 4px; }
+
+.topbar {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 18px 16px 0;
+}
+.brand { font-weight: 700; font-size: 20px; color: var(--accent); text-decoration: none; }
+.readonly { color: var(--muted); font-size: 13px; }
+
+.page { max-width: 1080px; margin: 0 auto; padding: 8px 16px 24px; }
+.footer { text-align: center; color: var(--muted); font-size: 13px; padding: 0 16px 24px; }
+
+.month-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 12px 0 16px;
+}
+.month-nav h1 { margin: 0; font-size: 26px; text-align: center; }
+.nav-button {
+  color: var(--accent);
+  text-decoration: none;
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  font-size: 14px;
+  white-space: nowrap;
+}
+.nav-button:hover { background: var(--accent-soft); }
+.nav-button .short { display: none; }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 16px 18px;
+  margin-bottom: 16px;
+}
+.card h2 { margin: 0 0 12px; font-size: 16px; }
+
+.cards, .grid { display: grid; gap: 16px; margin-bottom: 16px; }
+.cards { grid-template-columns: repeat(4, 1fr); }
+.cards .card, .grid .card { margin-bottom: 0; }
+.stat { display: flex; flex-direction: column; gap: 2px; }
+.stat-label { color: var(--muted); font-size: 13px; }
+.stat-value { font-size: 24px; font-weight: 650; }
+.stat-value small { font-size: 14px; font-weight: 500; color: var(--muted); }
+.stat-value.up { color: var(--over); }
+.stat-value.down { color: var(--ok); }
+.stat-note { color: var(--muted); font-size: 13px; }
+
+.grid { grid-template-columns: 1fr 1fr; }
+
+.bars { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.bar-row { display: grid; grid-template-columns: 110px 1fr auto; align-items: center; gap: 10px; }
+.bar-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bar-track { height: 10px; background: var(--track); border-radius: 999px; overflow: hidden; }
+.bar-fill { display: block; height: 100%; background: var(--accent); border-radius: 999px; }
+.bar-fill.level-ok { background: var(--ok); }
+.bar-fill.level-warning { background: var(--warning); }
+.bar-fill.level-over { background: var(--over); }
+.bar-value { text-align: right; white-space: nowrap; }
+.bar-value small { color: var(--muted); margin-left: 4px; }
+.level-text-warning { color: var(--warning) !important; font-weight: 600; }
+.level-text-over { color: var(--over) !important; font-weight: 600; }
+
+.trend {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 12px;
+}
+.trend-item a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: inherit;
+  text-decoration: none;
+  border-radius: 8px;
+  padding: 6px 0;
+}
+.trend-item a:hover { background: var(--track); }
+.trend-value { font-size: 12px; color: var(--muted); }
+.trend-track {
+  display: flex;
+  align-items: flex-end;
+  width: 36px;
+  height: 120px;
+  background: var(--track);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.trend-fill { display: block; width: 100%; background: var(--accent-soft); border-radius: 6px 6px 0 0; }
+.trend-item.current .trend-fill { background: var(--accent); }
+.trend-item.current .trend-label { font-weight: 700; color: var(--accent); }
+.trend-label { font-size: 13px; }
+
+.table-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+.table-head h2 { margin: 0; }
+.filters { display: flex; gap: 12px; flex-wrap: wrap; font-size: 14px; color: var(--muted); }
+.filters label { display: flex; align-items: center; gap: 6px; }
+.filters select {
+  font: inherit;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 4px 8px;
+}
+
+.expenses { width: 100%; border-collapse: collapse; }
+.expenses th, .expenses td { padding: 8px 6px; border-bottom: 1px solid var(--border); text-align: left; }
+.expenses th { color: var(--muted); font-weight: 500; font-size: 13px; }
+.expenses tfoot td { border-bottom: 0; font-weight: 650; }
+.expenses .num { text-align: right; white-space: nowrap; }
+.expenses .note { color: var(--muted); }
+.tag { background: var(--accent-soft); color: var(--text); border-radius: 999px; padding: 1px 8px; font-size: 13px; }
+
+.empty { color: var(--muted); margin: 0; }
+.error { color: var(--over); font-weight: 600; }
+
+.htmx-request #month, #month.htmx-request, #expenses.htmx-request { opacity: 0.6; transition: opacity 0.15s; }
+
+@media (max-width: 760px) {
+  .cards { grid-template-columns: 1fr 1fr; }
+  .grid { grid-template-columns: 1fr; }
+  .month-nav h1 { font-size: 20px; }
+  .nav-button .full { display: none; }
+  .nav-button .short { display: inline; }
+  .trend { gap: 4px; }
+  .trend-track { width: 24px; }
+  .expenses .note { display: none; }
+}
