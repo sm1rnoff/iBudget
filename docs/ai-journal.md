@@ -83,3 +83,16 @@ A running log of how AI assistants were used to build iBudget, one entry per mod
   - The first `report` command decided the colour thresholds itself (`>= 90`), duplicating budget logic in the CLI. Moved into one `level_for()` function in the budgets service, used by both the budget list and the report.
   - A test expected "no data" for an empty month although a budget existed (budgets always show in the report). The behaviour was right; the test was split so the empty case runs on a fresh database.
 - **Testing:** 19 new tests: exact level thresholds (26999 / 27000 / 30000 / 30001 cents for a 300 budget), month boundaries (1st and 30th in, 1st of next month out), a trend across a year boundary, CLI warnings. Manual `report` run.
+
+## 5. CSV import/export — 2026-11-02
+
+- **Tool:** Claude Code (Opus 5.5).
+- **Goal:** import bank statements safely (preview, duplicates, bad rows) and export to CSV.
+- **Key prompts:** "Implement step 6 of the plan: CSV import with column mapping, date formats, comma decimals, duplicate detection and dry-run, plus export, tested with a sample bank CSV."
+- **What the AI produced:** `services/csv_io.py` (`ColumnMap`, `import_csv`, `export_csv`), `import` / `export` commands with a dry-run preview table, `tests/fixtures/bank_sample.csv` (semicolon-separated, `dd.mm.yyyy` dates, `1.234,56` amounts, an income row and three broken rows).
+- **What I corrected or rejected:**
+  - The plan said "take absolute values". While writing the fixture the AI noticed that a salary row would then be imported as an expense, and added a `--signed` option (bank convention: negative = expense, positive rows skipped as income).
+  - The plan's duplicate key `sha256(date|amount|note)` would merge two genuine identical rows (two coffees on the same day). The key now also includes the row's occurrence number among identical rows in the file, so re-importing is still idempotent.
+  - `csv.Sniffer` can mistake decimal commas (`12,50`) for the delimiter in semicolon files, so the delimiter is now picked from the header line only.
+  - One CLI test had a wrong hand-calculated total (1,945.46 instead of 1,948.46) — the test was fixed, the code was right.
+- **Testing:** 16 new tests, including the fixture end to end, re-import = all duplicates, dry run writes nothing, missing/explicitly mapped columns, and an export → import round trip into a fresh database (with commas and quotes in notes).

@@ -166,3 +166,48 @@ def test_report(run):
 
 def test_report_empty(run):
     assert "No expenses or budgets for January 2020" in run("report", "-m", "2020-01").output
+
+
+BANK_ARGS = (
+    "tests/fixtures/bank_sample.csv",
+    "--map",
+    "date=Booking date,amount=Amount,note=Description,category=Category",
+    "--date-format",
+    "%d.%m.%Y",
+    "--signed",
+)
+
+
+def test_import_dry_run_then_import(run):
+    result = run("import", *BANK_ARGS, "--dry-run")
+    assert result.exit_code == 0, result.output
+    assert "Dry run: bank_sample.csv" in result.output
+    assert "Would import 6 expense(s); skipped 1 income row(s), 3 invalid row(s)." in result.output
+    assert "No expenses" in run("list", "--month", "2026-11").output
+
+    result = run("import", *BANK_ARGS)
+    assert "Imported 6 expense(s); skipped 1 income row(s), 3 invalid row(s)." in result.output
+    assert "line 9: 'abc' is not a valid amount." in result.output
+    assert "1,948.46" in run("list", "--month", "2026-11").output  # total
+
+    assert "skipped 6 duplicate(s)" in run("import", *BANK_ARGS).output
+
+
+def test_import_errors(run):
+    result = run("import", "tests/fixtures/bank_sample.csv")
+    assert result.exit_code == 1
+    assert "Column 'date' (for date) not found" in result.output
+
+
+def test_export(run, tmp_path):
+    run("add", "12.50", "food", "Lunch", "--date", "2026-11-02")
+    result = run("export")
+    assert result.output.splitlines() == [
+        "id,date,amount,category,note",
+        "1,2026-11-02,12.50,food,Lunch",
+    ]
+
+    target = tmp_path / "out.csv"
+    result = run("export", "--month", "2026-11", "--output", str(target))
+    assert "Exported 1 expense(s)" in result.output
+    assert "Lunch" in target.read_text()

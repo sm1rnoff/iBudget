@@ -35,7 +35,21 @@ Data is stored in your user data directory. Set `IBUDGET_DB=/path/to/file.db` or
 | `ibudget budget list [--month YYYY-MM]` | Budgets with spent, left and % used |
 | `ibudget budget remove CATEGORY` | Remove a budget |
 | `ibudget report [--month YYYY-MM]` | Spending per category: share, budget usage and change vs the previous month |
+| `ibudget import FILE [--map date=Col,amount=Col,note=Col,category=Col] [--date-format FMT] [--default-category C] [--signed] [--dry-run]` | Import a CSV (e.g. a bank statement); re-importing skips duplicates |
+| `ibudget export [--month YYYY-MM] [--output FILE]` | Export as CSV (stdout by default); the file can be imported again |
 | `ibudget config get [KEY]` / `ibudget config set KEY VALUE` | Show or change settings (`currency`, default `EUR`) |
+
+### Importing a bank statement
+
+```bash
+ibudget import statement.csv \
+  --map "date=Booking date,amount=Amount,note=Description" \
+  --date-format %d.%m.%Y --signed --dry-run     # preview first, then run again without --dry-run
+```
+
+- The delimiter (`,` `;` or tab) is detected from the header line; amounts may use `12,50` or `1.234,56`.
+- `--signed`: negative amounts are expenses, positive rows (income) are skipped. Without it every amount is taken as an expense.
+- Rows whose category column matches a known category keep it; the rest go to `--default-category` (default `other`).
 
 ## Development
 

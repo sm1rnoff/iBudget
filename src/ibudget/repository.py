@@ -111,6 +111,16 @@ class Repository:
         assert expense is not None
         return expense
 
+    def add_imported(self, rows: list[tuple[dt.date, int, int, str, str]]) -> int:
+        """Insert (date, amount_cents, category_id, note, import_hash) rows in one transaction."""
+        with self.conn:
+            self.conn.executemany(
+                "INSERT INTO expenses (date, amount_cents, category_id, note, import_hash)"
+                " VALUES (?, ?, ?, ?, ?)",
+                [(date.isoformat(), *rest) for date, *rest in rows],
+            )
+        return len(rows)
+
     def get_expense(self, expense_id: int) -> Expense | None:
         row = self.conn.execute(f"{_EXPENSE_SELECT} WHERE e.id = ?", (expense_id,)).fetchone()
         return _to_expense(row) if row else None

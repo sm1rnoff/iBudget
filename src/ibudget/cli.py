@@ -1,5 +1,6 @@
 """The `ibudget` command line. Parses input, calls services, prints results; no business logic."""
 
+import sys
 from collections.abc import Iterator
 from contextlib import contextmanager
 from enum import StrEnum
@@ -15,7 +16,7 @@ from ibudget.models import Expense
 from ibudget.money import format_amount
 from ibudget.period import Month, parse_date
 from ibudget.repository import Repository
-from ibudget.services import budgets, categories, expenses, reports
+from ibudget.services import budgets, categories, csv_io, expenses, reports
 
 app = typer.Typer(help="iBudget: track personal expenses.", no_args_is_help=True)
 category_app = typer.Typer(help="List, add, rename and delete categories.", no_args_is_help=True)
@@ -381,3 +382,99 @@ def report(
                 _signed_percent(row.change_percent),
             )
         console.print(table)
+
+
+# --- import / export ------------------------------------------------------
+
+STATUS_STYLE = {
+    csv_io.RowStatus.new: "green",
+    csv_io.RowStatus.duplicate: "dim",
+    csv_io.RowStatus.invalid: "red",
+    csv_io.RowStatus.income: "dim",
+}
+
+
+@app.command("import")
+def import_(
+    ctx: typer.Context,
+    file: Path = typer.Argument(..., help="CSV file, e.g. a bank statement."),
+    mapping: str | None = typer.Option(
+        None,
+        "--map",
+        help="Column names in the file, e.g. 'date=Booking date,amount=Amount,note=Description'."
+        " Defaults: date, amount, note, category.",
+    ),
+    date_format: str = typer.Option("%Y-%m-%d", "--date-format", help="e.g. %d.%m.%Y"),
+    default_category: str = typer.Option(
+        "other", "--default-category", help="For rows without a known category."
+    ),
+    signed: bool = typer.Option(
+        False, "--signed", help="Bank style: negative amounts are expenses, positive are skipped."
+    ),
+    dry_run: bool = typer.Option(
+        False, "--dry-run", help="Show what would happen; change nothing."
+    ),
+) -> None:
+    """Import expenses from a CSV file. Importing the same file twice skips duplicates."""
+    with _session(ctx) as repo:
+        result = csv_io.import_csv(
+            repo,
+            file,
+            csv_io.ColumnMap.parse(mapping),
+            date_format=date_format,
+            default_category=default_category,
+            signed=signed,
+            dry_run=dry_run,
+        )
+        if dry_run:
+            table = Table(title=f"Dry run: {file.name}")
+            for column in ("Line", "Status", "Date", "Amount", "Category", "Note / reason"):
+                table.add_column(
+                    column, justify="right" if column in ("Line", "Amount") else "left"
+                )
+            for row in result.rows:
+                table.add_row(
+                    str(row.line),
+                    f"[{STATUS_STYLE[row.status]}]{row.status}[/]",
+                    row.date.isoformat() if row.date else "",
+                    format_amount(row.amount_cents) if row.amount_cents else "",
+                    row.category,
+                    row.reason or row.note,
+                )
+            console.print(table)
+        new = result.count(csv_io.RowStatus.new)
+        verb = "Would import" if dry_run else "✔ Imported"
+        skipped = [
+            f"{count} {label}"
+            for status, label in (
+                (csv_io.RowStatus.duplicate, "duplicate(s)"),
+                (csv_io.RowStatus.income, "income row(s)"),
+                (csv_io.RowStatus.invalid, "invalid row(s)"),
+            )
+            if (count := result.count(status))
+        ]
+        summary = f"{verb} {new} expense(s)"
+        if skipped:
+            summary += f"; skipped {', '.join(skipped)}"
+        console.print(f"[green]{summary}.[/green]")
+        if not dry_run:
+            for row in result.rows:
+                if row.status is csv_io.RowStatus.invalid:
+                    console.print(f"[yellow]  line {row.line}: {row.reason}[/yellow]")
+
+
+@app.command()
+def export(
+    ctx: typer.Context,
+    month: str | None = typer.Option(None, "--month", "-m", help="YYYY-MM (default: everything)."),
+    output: Path | None = typer.Option(None, "--output", "-o", help="File (default: stdout)."),
+) -> None:
+    """Export expenses as CSV (the file can be imported again)."""
+    with _session(ctx) as repo:
+        period = Month.parse(month) if month else None
+        if output is None:
+            csv_io.export_csv(repo, sys.stdout, period)
+            return
+        with output.open("w", newline="", encoding="utf-8") as handle:
+            count = csv_io.export_csv(repo, handle, period)
+        err_console.print(f"[green]✔ Exported {count} expense(s) to {output}[/green]")
