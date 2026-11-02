@@ -7,6 +7,10 @@ Record what you spend, group it into categories, set monthly budgets, import ban
 - Requirements: [docs/requirements.md](docs/requirements.md)
 - How AI was used to build it: [docs/ai-journal.md](docs/ai-journal.md)
 
+![Dashboard](docs/screenshots/dashboard-dark.jpg)
+
+![CLI](docs/screenshots/cli-report.svg)
+
 ## Setup
 
 Requires Python 3.14.
@@ -71,5 +75,10 @@ A read-only page for one month at a time: summary cards, where the money went, b
 
 ```bash
 .venv/bin/pytest                  # tests
+.venv/bin/pytest --cov=ibudget    # with coverage
 .venv/bin/ruff check .            # lint
 ```
+
+Project rules for AI agents are in [CLAUDE.md](CLAUDE.md). Agent skills live in `.agents/skills/` and are linked into `.claude/skills/` for Claude Code:
+
+- [`add-ibudget-command`](.agents/skills/add-ibudget-command/SKILL.md): the checklist for adding or changing a CLI command (service → thin Typer wrapper → tests → docs).

@@ -115,3 +115,17 @@ A running log of how AI assistants were used to build iBudget, one entry per mod
   - ruff flagged `Depends(...)` defaults; switched to FastAPI's recommended `Annotated[..., Depends(...)]` style.
   - Starlette deprecated `httpx` for its test client; the dev dependency is now `httpx2`.
 - **Testing:** 14 web tests with FastAPI's `TestClient` (full page, fragments, `HX-Push-Url`, filters, sorting, empty month, 400/422 errors, read-only `POST` → 405, HTML escaping). In the browser: filter, month switch and back button verified without a full reload (a JS marker survived), no console errors, mobile and light/dark layouts.
+
+## 7. Project skill, polish & evidence — 2026-11-02
+
+- **Tool:** Claude Code (Opus 5.5).
+- **Goal:** capture the project's way of working as a reusable agent skill, and collect evidence that the system works.
+- **Key prompts:**
+  1. (from my plan review) "All skills must be stored under .agents/skills folder and referred by shortcuts from .claude/skills folder."
+  2. "Implement step 8 of the plan: the add-ibudget-command skill, README usage, demo data and screenshots."
+- **What the AI produced:**
+  - `.agents/skills/add-ibudget-command/SKILL.md` — the checklist used throughout this project (where logic goes, a command template, which tests, which docs), exposed to Claude Code through a relative symlink `.claude/skills/add-ibudget-command`.
+  - A test for `ibudget serve` (uvicorn mocked), bringing coverage to 99%.
+  - Screenshots in `docs/screenshots/`: the dashboard (dark; light with a filter applied) and a terminal capture of real `add` / `report` / `budget list` output, recorded with Rich against a copy of the demo database.
+- **What I corrected or rejected:** the Claude desktop preview tool still read the previous project's `launch.json`, so the dashboard server was started from the shell for the browser checks instead of editing the other repository.
+- **Testing:** 117 tests, 99% coverage, ruff clean; the plan's end-to-end CLI scenario run against a fresh database (add, category add/rename/delete with reassign, budget, import dry-run/import/re-import, list, report, export).

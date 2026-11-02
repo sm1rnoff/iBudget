@@ -211,3 +211,17 @@ def test_export(run, tmp_path):
     result = run("export", "--month", "2026-11", "--output", str(target))
     assert "Exported 1 expense(s)" in result.output
     assert "Lunch" in target.read_text()
+
+
+def test_serve_starts_uvicorn_on_localhost(run, monkeypatch):
+    import uvicorn
+
+    calls = {}
+    monkeypatch.setattr(uvicorn, "run", lambda app, **kwargs: calls.update(app=app, **kwargs))
+    result = run("serve", "--port", "9000")
+    assert result.exit_code == 0
+    assert "http://127.0.0.1:9000" in result.output
+    assert (calls["host"], calls["port"]) == ("127.0.0.1", 9000)
+
+    result = run("serve", "--host", "0.0.0.0")
+    assert "other machines may see your data" in result.output
