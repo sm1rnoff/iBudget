@@ -6,12 +6,13 @@ Personal expense tracker: the `ibudget` CLI plus a read-only HTMX dashboard (`ib
 
 - Python 3.14, package in `src/ibudget/`, installed editable into `.venv`.
 - Typer + Rich for the CLI; FastAPI + Jinja2 + HTMX for the dashboard; SQLite through the standard `sqlite3` module.
-- pytest (+ pytest-cov, httpx2 for FastAPI's TestClient) and ruff.
+- pytest (+ pytest-cov, httpx2 for FastAPI's TestClient, pytest-playwright for browser tests) and ruff.
 
 ## Commands
 
 ```bash
 python3.14 -m venv .venv && .venv/bin/pip install -e ".[dev]"   # first-time setup
+.venv/bin/playwright install chromium                            # browser for tests/test_browser.py
 .venv/bin/pytest                    # all tests
 .venv/bin/pytest --cov=ibudget      # with coverage
 .venv/bin/ruff check . && .venv/bin/ruff format --check .
@@ -32,6 +33,7 @@ Always use `.venv/bin/...` or `python3.14`. Plain `python3` on this machine is t
 ## Working rules
 
 - Every change ships with tests. Tests use a temporary database (the `db_path` fixture); never touch the real one.
+- A dashboard change that affects what HTMX swaps, where, or the URL it pushes also gets a test in `tests/test_browser.py`.
 - Before saying a change is done: `.venv/bin/pytest` and `.venv/bin/ruff check .` must pass.
 - When adding or changing a command, update the command table in `README.md`.
 - After finishing a module, add an entry to `docs/ai-journal.md` (template at the top).

@@ -23,6 +23,7 @@ dev = [
     "pytest-cov>=6.0",
     "ruff>=0.8",
     "httpx2>=2.16",
+    "pytest-playwright>=0.10",
 ]
 
 [project.scripts]
@@ -37,6 +38,7 @@ ibudget = ["web/templates/**/*.html", "web/static/*"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"
+markers = ["browser: end-to-end tests in Chromium; need `playwright install chromium` and network"]
 
 [tool.coverage.run]
 source = ["ibudget"]

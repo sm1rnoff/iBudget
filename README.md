@@ -74,10 +74,14 @@ A read-only page for one month at a time: summary cards, where the money went, b
 ## Development
 
 ```bash
-.venv/bin/pytest                  # tests
-.venv/bin/pytest --cov=ibudget    # with coverage
-.venv/bin/ruff check .            # lint
+.venv/bin/playwright install chromium   # once: the browser used by the browser tests
+.venv/bin/pytest                        # tests
+.venv/bin/pytest --cov=ibudget          # with coverage
+.venv/bin/pytest -m "not browser"       # skip the browser tests (e.g. offline)
+.venv/bin/ruff check .                  # lint
 ```
+
+`tests/test_browser.py` drives the dashboard in headless Chromium with [Playwright](https://playwright.dev/python/): month links, trend bars, the category filter and sorting must swap in place without a full reload, and the address bar, tab title and back button must follow. HTMX is loaded from its CDN, so these tests need network access. Add `--headed --slowmo 500` to watch them run.
 
 Project rules for AI agents are in [CLAUDE.md](CLAUDE.md). Agent skills live in `.agents/skills/` and are linked into `.claude/skills/` for Claude Code:
 

@@ -129,3 +129,17 @@ A running log of how AI assistants were used to build iBudget, one entry per mod
   - Screenshots in `docs/screenshots/`: the dashboard (dark; light with a filter applied) and a terminal capture of real `add` / `report` / `budget list` output, recorded with Rich against a copy of the demo database.
 - **What I corrected or rejected:** the Claude desktop preview tool still read the previous project's `launch.json`, so the dashboard server was started from the shell for the browser checks instead of editing the other repository.
 - **Testing:** 117 tests, 99% coverage, ruff clean; the plan's end-to-end CLI scenario run against a fresh database (add, category add/rename/delete with reassign, budget, import dry-run/import/re-import, list, report, export).
+
+## 8. Browser tests — 2026-11-02
+
+- **Tool:** Claude Code (Opus 5.5).
+- **Goal:** test the dashboard's HTMX behaviour in a real browser, not only the HTML each route returns.
+- **Key prompts:**
+  1. "can I test htmx web site with cypress framework?" → yes, but the AI recommended pytest-playwright for this repo: same language, same `pytest` run, no Node toolchain.
+  2. "Use Playwright"
+- **What the AI produced:**
+  - `tests/test_browser.py`: uvicorn serves the app from a seeded temporary database in a background thread (on a port the OS picks), and pytest-playwright drives headless Chromium.
+  - Four tests: month link, trend bar, back button, category filter + sort. Each checks the swapped content, the pushed URL (and title), and a JS marker on `window` that a full reload would wipe out.
+  - A `browser` pytest marker, so `pytest -m "not browser"` skips them offline (HTMX comes from the CDN).
+- **What I corrected or rejected:** the first run of the filter-then-sort test failed: the Sort change right after the category swap sent no request. HTMX only wires up swapped-in elements (the re-rendered filter form) when it settles, ~20 ms after the swap, and Playwright was faster than that. Not a dashboard bug, so the tests now wait for the `htmx-settling` class to clear before the next interaction.
+- **Testing:** 5 runs in a row green. Mutation check: removing `hx-get` from the previous-month link and switching the filter to `hx-trigger="submit"` made 3 of the 4 tests fail, as expected. Full suite: 121 tests, 99% coverage, ruff clean.
