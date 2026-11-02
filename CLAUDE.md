@@ -39,5 +39,6 @@ Always use `.venv/bin/...` or `python3.14`. Plain `python3` on this machine is t
 - After finishing a module, add an entry to `docs/ai-journal.md` (template at the top).
 - Use the `add-ibudget-command` skill whenever adding or changing a CLI command.
 - Use the `write-ibudget-tests` skill whenever writing or fixing tests.
+- Use the `change-ibudget-schema` skill for any change to the database schema (a table, column or index, or `db.py`). Existing databases must keep working.
 - Agent skills live in `.agents/skills/<name>/SKILL.md`. Expose each one to Claude Code with a relative symlink: `ln -s ../../.agents/skills/<name> .claude/skills/<name>`.
 - Commit in small steps with clear messages. Do not push unless asked.

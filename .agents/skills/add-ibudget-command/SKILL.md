@@ -12,6 +12,7 @@ iBudget keeps the CLI and the web dashboard as thin layers over shared services 
 | Need | Put it in |
 |---|---|
 | New SQL query | a method on `Repository` in `src/ibudget/repository.py` (the only place with SQL) |
+| New stored data (a table or column) | a migration step in `src/ibudget/db.py`; follow the `change-ibudget-schema` skill first |
 | Validation, calculations, rules | a function in `src/ibudget/services/<area>.py` (`expenses`, `categories`, `budgets`, `reports`, `csv_io`) or `config.py` |
 | Parsing user text | reuse `money.parse_amount` / `parse_positive_amount`, `period.Month.parse`, `period.parse_date`, `categories.require` |
 | Output formatting | `cli.py` only (Rich tables, `format_amount`) |
