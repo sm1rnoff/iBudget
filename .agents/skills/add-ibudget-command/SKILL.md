@@ -53,6 +53,8 @@ def thing(
 
 ## 4. Test both layers
 
+Follow the `write-ibudget-tests` skill for fixtures, test data and the check that each new test can fail.
+
 - Service test in `tests/test_<area>.py` using the `repo` and `add` fixtures from `tests/conftest.py`.
 - CLI test in `tests/test_cli.py` with the `run(...)` fixture: the happy path, and at least one user error that must exit with code 1 and no `Traceback` (add it to `test_user_errors_exit_1_without_traceback` when it fits).
 - Tests use a temporary database automatically (`IBUDGET_DB` is set by an autouse fixture). Never point a test at a real database.

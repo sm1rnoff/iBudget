@@ -143,3 +143,14 @@ A running log of how AI assistants were used to build iBudget, one entry per mod
   - A `browser` pytest marker, so `pytest -m "not browser"` skips them offline (HTMX comes from the CDN).
 - **What I corrected or rejected:** the first run of the filter-then-sort test failed: the Sort change right after the category swap sent no request. HTMX only wires up swapped-in elements (the re-rendered filter form) when it settles, ~20 ms after the swap, and Playwright was faster than that. Not a dashboard bug, so the tests now wait for the `htmx-settling` class to clear before the next interaction.
 - **Testing:** 5 runs in a row green. Mutation check: removing `hx-get` from the previous-month link and switching the filter to `hx-trigger="submit"` made 3 of the 4 tests fail, as expected. Full suite: 121 tests, 99% coverage, ruff clean.
+
+## 9. Testing skill — 2026-11-02
+
+- **Tool:** Claude Code (Opus 5.5), with Anthropic's `skill-creator` skill for the structure and validation.
+- **Goal:** a reusable skill so any agent writes tests that fit this suite instead of generic pytest.
+- **Key prompts:**
+  1. "is there a skill for pytest I could use ready and will fit my use-case?" → the AI searched the skill and plugin catalogs. There was no standalone pytest skill; py-pit's `pytest-service` comes bundled with skills for uv, SQLAlchemy, Alembic and Click, which this project does not use, and the Playwright plugins duplicate the browser tests already here.
+  2. "Yes, write it"
+- **What the AI produced:** `.agents/skills/write-ibudget-tests/SKILL.md`, linked from `.claude/skills/`: which layer and file to test in, test data rules (temporary database, fixed dates, cents, data that proves something), the shape of a test, the browser-test rules learned in step 8 (seed through `EXPENSES`, the reload marker, `wait_until_settled`), proving each test can fail, and how to report. `add-ibudget-command` now points to it for its testing step.
+- **What I corrected or rejected:** nothing yet. The skill-creator's with/without-skill benchmark was not run, so the skill is checked by validation only.
+- **Testing:** skill-creator's `quick_validate` passes; a script confirmed that all 30 fixtures, helpers, test names and paths the skill cites exist; Claude Code listed the skill as soon as it was linked. Suite unchanged: 121 tests, ruff clean.

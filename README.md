@@ -86,3 +86,4 @@ A read-only page for one month at a time: summary cards, where the money went, b
 Project rules for AI agents are in [CLAUDE.md](CLAUDE.md). Agent skills live in `.agents/skills/` and are linked into `.claude/skills/` for Claude Code:
 
 - [`add-ibudget-command`](.agents/skills/add-ibudget-command/SKILL.md): the checklist for adding or changing a CLI command (service → thin Typer wrapper → tests → docs).
+- [`write-ibudget-tests`](.agents/skills/write-ibudget-tests/SKILL.md): how to test each layer here (fixtures, temporary database, fixed dates and cents, HTMX browser tests) and how to prove a new test can fail.
