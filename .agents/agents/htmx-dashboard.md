@@ -1,6 +1,6 @@
 ---
 name: htmx-dashboard
-description: Builds and changes the iBudget read-only HTMX dashboard — routes in src/ibudget/web/app.py, Jinja templates and partials, hx-* attributes and HX-Push-Url, dashboard.css, and the TestClient and Playwright browser tests. Use for any task about what the dashboard shows, or how it swaps, looks or behaves in the browser. Not for services, SQL, the database or the CLI.
+description: Use for iBudget read-only HTMX dashboard — routes in src/ibudget/web/app.py, Jinja templates and partials, hx-* attributes and HX-Push-Url, dashboard.css, and the TestClient and Playwright browser tests. Use for any task about what the dashboard shows, or how it swaps, looks or behaves in the browser. Not for services, SQL, the database or the CLI.
 model: inherit
 color: blue
 skills:

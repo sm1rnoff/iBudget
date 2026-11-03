@@ -1,6 +1,6 @@
 ---
 name: python-core
-description: Builds and changes iBudget's Python core — ibudget CLI commands (cli.py), services, repository SQL, the database schema and migrations (db.py), models, money and month helpers, settings, CSV import/export, and their pytest tests. Use for any task about stored data, business rules or the ibudget command line. Not for templates, CSS or HTMX wiring.
+description: Use for ibudget CLI commands (cli.py), services, repository SQL, the database schema and migrations (db.py), models, money and month helpers, settings, CSV import/export, and their pytest tests. Use for any task about stored data, business rules or the ibudget command line. Not for templates, CSS or HTMX wiring.
 model: inherit
 color: green
 skills:
