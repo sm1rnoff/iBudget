@@ -89,7 +89,7 @@ Project rules for AI agents are in [CLAUDE.md](CLAUDE.md). Agent skills live in 
 - [`write-ibudget-tests`](.agents/skills/write-ibudget-tests/SKILL.md): how to test each layer here (fixtures, temporary database, fixed dates and cents, HTMX browser tests) and how to prove a new test can fail.
 - [`change-ibudget-schema`](.agents/skills/change-ibudget-schema/SKILL.md): how to change the database schema so existing databases upgrade safely (versioned migration steps, a backup, an upgrade test from a frozen copy of the previous version).
 
-Two Claude Code subagents split the work by layer; the main agent routes tasks between them (rules in [CLAUDE.md](CLAUDE.md)):
+Two Claude Code subagents in `.agents/agents/` (linked into `.claude/agents/`) split the work by layer; the main agent routes tasks between them (rules in [CLAUDE.md](CLAUDE.md)):
 
-- [`python-core`](.claude/agents/python-core.md): the CLI, services, repository SQL, database schema and their tests.
-- [`htmx-dashboard`](.claude/agents/htmx-dashboard.md): the dashboard's routes, templates, HTMX wiring, CSS, and web and browser tests.
+- [`python-core`](.agents/agents/python-core.md): the CLI, services, repository SQL, database schema and their tests.
+- [`htmx-dashboard`](.agents/agents/htmx-dashboard.md): the dashboard's routes, templates, HTMX wiring, CSS, and web and browser tests.

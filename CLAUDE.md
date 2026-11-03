@@ -41,11 +41,12 @@ Always use `.venv/bin/...` or `python3.14`. Plain `python3` on this machine is t
 - Use the `write-ibudget-tests` skill whenever writing or fixing tests.
 - Use the `change-ibudget-schema` skill for any change to the database schema (a table, column or index, or `db.py`). Existing databases must keep working.
 - Agent skills live in `.agents/skills/<name>/SKILL.md`. Expose each one to Claude Code with a relative symlink: `ln -s ../../.agents/skills/<name> .claude/skills/<name>`.
+- Subagents live in `.agents/agents/<name>.md` and are exposed the same way, one symlink per file: `ln -s ../../.agents/agents/<name>.md .claude/agents/<name>.md`. If an edit to a subagent doesn't take effect, restart the session.
 - Commit in small steps with clear messages. Do not push unless asked.
 
 ## Subagents
 
-Two project subagents in `.claude/agents/` split the work by layer. The main agent decides who does what. It also owns the shared docs (`docs/requirements.md`, `docs/ai-journal.md`, `CLAUDE.md`, the skills) and makes every commit.
+Two project subagents in `.agents/agents/` (linked from `.claude/agents/`) split the work by layer. The main agent decides who does what. It also owns the shared docs (`docs/requirements.md`, `docs/ai-journal.md`, `CLAUDE.md`, the skills) and makes every commit.
 
 | Agent | Owns |
 |---|---|
