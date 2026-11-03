@@ -189,3 +189,11 @@ A running log of how AI assistants were used to build iBudget, one entry per mod
   - The baseline was not clean. Subagents inherit the session's skill list, so the baseline agents saw the skill's one-line description, which already names versioned steps and a frozen dump.
   - Ungraded differences went the skill's way. Only the with-skill runs back up the database before upgrading and refuse a database from a newer version, and they wrote more upgrade tests.
 - **Testing:** a checker restored a pristine version-1 demo database (140 expenses, 9 categories, 4 budgets) for every run. It then ran that run's code on it, compared the schema with a new database, and tried the new feature. The real database's fingerprint was unchanged afterwards.
+- **Clean rerun** ("Rerun them"): the three baselines were run again with the skill fully hidden.
+  - **How it was hidden:** the skill link and the CLAUDE.md rule were removed for the duration of the runs. The copies started from the commit before the skill, with later history pruned, and got the same prompt as the with-skill runs. Only the skill's *name* could still be seen, in the session's list of recent commit titles.
+  - **Result:** 17/17 again. Without the skill, Opus still found the trap in all three tasks. It wrote versioned steps in one transaction and upgrade tests with data, and it left the schema alone for the setting.
+  - **What only the skill produced:**
+    - a backup before upgrading (with skill 2/2, without 0/2);
+    - a refusal of databases from a newer version (2/2 vs 0/2);
+    - upgrade tests that start from a dump made by the old code. One clean baseline froze the schema inside its test. The other rebuilt it from the new code's constant, which would follow a later accidental edit.
+  - **Conclusion:** the skill doesn't make the difference between a working and a broken migration on Opus. It does make migrations safer and more uniform.
