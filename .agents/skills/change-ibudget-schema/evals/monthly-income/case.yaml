@@ -1,0 +1,7 @@
+schema_version: "1.1"
+name: monthly-income
+expected_outcome: |
+  Income per month stored as integer cents in a new table, created by a migration step that
+  upgrades existing databases in place. An existing version-1 database keeps all its data,
+  is not re-seeded, matches a new database's schema, and `income set` plus `report` work on
+  it right away. The suite has an upgrade test. Suite and ruff pass.

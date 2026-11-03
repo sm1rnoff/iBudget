@@ -173,3 +173,19 @@ A running log of how AI assistants were used to build iBudget, one entry per mod
   - Iteration 1 found a flaw in the skill itself: its example date and its "fixed dates around November 2026" advice matched the day of the run, so the with-skill agent's "explicit date" test could not notice `expenses.add` ignoring its date argument. The baseline had pinned today and caught it. The skill now says explicit inputs must differ from the default the code falls back to; in iteration 2 the with-skill agent used a 2025 date and the planted bug was caught.
   - The honest result: both models already pass every check without the skill, because CLAUDE.md, the conftest fixtures and the documented browser helpers carry the conventions. The skill's measurable effect is small (one fixed blind spot, a lighter-touch browser seed change). Showing a real benefit would need harder cases where the code does not already demonstrate the pattern.
 - **Testing:** one run per configuration and case (12 agent runs). The grader re-ran every copy's full suite, ruff, the browser tests 3 times, and planted bugs (an ignored date argument, `<` → `<=` on month ends) against each run's new tests.
+
+## 11. Schema-change skill — 2026-11-03
+
+- **Tool:** Claude Code (Opus 5.5) with Anthropic's `skill-creator`; the benchmark ran each task with and without the skill, in separate clones with their own venvs.
+- **Goal:** a skill for the one change this codebase does not teach: altering the database schema without breaking users' existing files.
+- **Key prompts:**
+  1. "can you suggest other skills which may eventually improve the way you write and build this app?" → the AI ranked candidates by what the code does *not* already show; `db._migrate` only knows how to create a new database, and every test starts from an empty one.
+  2. "Yes, write it"
+- **What the AI produced:**
+  - `.agents/skills/change-ibudget-schema/SKILL.md`: when a schema change is needed at all (settings and computed values need none), freezing the current version as `tests/fixtures/schema_vN.sql`, append-only migration steps with one transaction each, a backup (`<file>.vN.bak`) before upgrading, SQLite limits (`executescript` commits, `ADD COLUMN` restrictions, `PRAGMA foreign_keys` ignored in a transaction), following new data through the app, and the upgrade tests.
+  - Before publishing, every SQLite claim was checked on Python 3.14 / SQLite 3.54. The skill's template was applied literally in a scratch clone: 122 tests passed, the demo database upgraded with a backup, and a newer file was refused with exit code 1.
+  - Three eval cases in `evals/`: a recurring flag (new column), monthly income (new table) and a trend-months setting (should need no schema change).
+- **What I corrected or rejected:** nothing in the skill. Benchmark result: 17/17 checks with and without the skill. Two caveats:
+  - The baseline was not clean. Subagents inherit the session's skill list, so the baseline agents saw the skill's one-line description, which already names versioned steps and a frozen dump.
+  - Ungraded differences went the skill's way. Only the with-skill runs back up the database before upgrading and refuse a database from a newer version, and they wrote more upgrade tests.
+- **Testing:** a checker restored a pristine version-1 demo database (140 expenses, 9 categories, 4 budgets) for every run. It then ran that run's code on it, compared the schema with a new database, and tried the new feature. The real database's fingerprint was unchanged afterwards.

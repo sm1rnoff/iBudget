@@ -1,0 +1,7 @@
+schema_version: "1.1"
+name: recurring-expenses-flag
+expected_outcome: |
+  A recurring flag stored per expense, added through a migration step that upgrades existing
+  databases in place: an existing version-1 database keeps all its data, is not re-seeded,
+  ends up with the same schema as a new one, and supports the new option right away. The
+  suite has an upgrade test from a database written by the previous version. Suite and ruff pass.

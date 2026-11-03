@@ -1,0 +1,7 @@
+schema_version: "1.1"
+name: trend-months-setting
+expected_outcome: |
+  A new key in config.SETTINGS with a validator and a default of 6, stored in the existing
+  settings table: no schema change, no migration and no change to SCHEMA_VERSION. The setting
+  works on an existing database, the dashboard trend follows it, invalid values give a clean
+  error. Suite and ruff pass.
