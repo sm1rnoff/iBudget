@@ -197,3 +197,16 @@ A running log of how AI assistants were used to build iBudget, one entry per mod
     - a refusal of databases from a newer version (2/2 vs 0/2);
     - upgrade tests that start from a dump made by the old code. One clean baseline froze the schema inside its test. The other rebuilt it from the new code's constant, which would follow a later accidental edit.
   - **Conclusion:** the skill doesn't make the difference between a working and a broken migration on Opus. It does make migrations safer and more uniform.
+
+## 12. Subagents per layer — 2026-11-03
+
+- **Tool:** Claude Code (Opus 5.5).
+- **Goal:** split the work between two specialised subagents, with the main agent routing tasks and handling the cases that span both.
+- **Key prompts:** "I want you to define a couple of sub-agents to share the work one for htmx related tasks and one for the python code. When there's a task related to both - you decide who and how to handle it"
+- **What the AI produced:**
+  - `.claude/agents/htmx-dashboard.md`: owns `web/` (routes, templates, partials, CSS) and the web and browser tests. It describes the HTMX conventions this app relies on: `HX-Push-Url` via `page_url()`, the `<title>` in the month partial, links and forms that also work without JavaScript, GET only, the ~20 ms settle, and visual checks at 375 and 320 px in light and dark mode. It preloads `write-ibudget-tests`.
+  - `.claude/agents/python-core.md`: owns everything in `src/ibudget/` outside `web/` and the remaining tests. It preloads `write-ibudget-tests` and `add-ibudget-command`, loads `change-ibudget-schema` before any schema change, and lists the service functions the dashboard depends on, so their contracts don't break unannounced.
+  - Both run with the session's model, can't spawn their own subagents, don't commit, and report a precise contract whenever they need something from the other side.
+  - CLAUDE.md "Subagents": an ownership table and routing rules. Small changes are done directly. One-sided tasks go to that agent. Tasks that touch both are split at the service boundary, with the contract written into both briefs: `python-core` goes first, then `htmx-dashboard` with its report. They run in parallel only when the halves are independent, each in its own worktree. The main agent reviews, writes the journal and commits.
+- **What I corrected or rejected:** agent files live directly in `.claude/agents/`, not in `.agents/` behind symlinks like the skills. The agent format is specific to Claude Code, and its docs don't say whether symlinked agent files are picked up.
+- **Testing:** the frontmatter was parsed and checked against the documented fields, and every preloaded skill exists. A script assigned all 38 files in `src/` and `tests/` to exactly one agent. The agents become available after a session restart, because `.claude/agents/` didn't exist when this session started.

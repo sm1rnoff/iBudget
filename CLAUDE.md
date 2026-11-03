@@ -42,3 +42,24 @@ Always use `.venv/bin/...` or `python3.14`. Plain `python3` on this machine is t
 - Use the `change-ibudget-schema` skill for any change to the database schema (a table, column or index, or `db.py`). Existing databases must keep working.
 - Agent skills live in `.agents/skills/<name>/SKILL.md`. Expose each one to Claude Code with a relative symlink: `ln -s ../../.agents/skills/<name> .claude/skills/<name>`.
 - Commit in small steps with clear messages. Do not push unless asked.
+
+## Subagents
+
+Two project subagents in `.claude/agents/` split the work by layer. The main agent decides who does what. It also owns the shared docs (`docs/requirements.md`, `docs/ai-journal.md`, `CLAUDE.md`, the skills) and makes every commit.
+
+| Agent | Owns |
+|---|---|
+| `python-core` | everything in `src/ibudget/` outside `web/` (CLI, services, repository, schema, models, helpers), all other tests including `tests/conftest.py` and `tests/fixtures/`, and the README command table |
+| `htmx-dashboard` | `web/app.py`, the templates and partials, `dashboard.css`, `tests/test_web.py`, `tests/test_browser.py`, and the README Dashboard section |
+
+How to route a task:
+- **A small change** (a few lines in one file): do it yourself. A subagent starts with no context and takes minutes.
+- **One side only:** send it to that agent. The brief names the files and says what "done" looks like.
+- **Both sides:** split at the service boundary.
+  1. Write the contract into both briefs: the service module and function, its arguments, and the returned dataclass fields.
+  2. `python-core` goes first: the stored data, the service, the CLI and their tests.
+  3. Then `htmx-dashboard`, with `python-core`'s report attached: routes, templates, CSS, web and browser tests.
+
+  Run them one after the other, because the dashboard half needs the service. Run in parallel only when the halves are truly independent (different files, no shared contract). Then give each one `isolation: "worktree"` and merge both branches afterwards.
+- **When an agent needs something from the other side:** it reports the need instead of editing the other agent's files. Pass that on as a brief to the other agent.
+- **Finishing:** review the combined diff, run `.venv/bin/pytest` and ruff, write the `docs/ai-journal.md` entry, then commit.
